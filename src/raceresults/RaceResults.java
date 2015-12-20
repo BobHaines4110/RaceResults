@@ -225,7 +225,8 @@ public class RaceResults {
     // get the race fields URLs from the meeting line
     public static void extractURL(String MeetingLine, String YesterdayDateString) {
         String URLstring = null;
-        String formpage;
+        String resultpage;
+        String Venue;
 
         // Split string based on '.
         String[] tokens = MeetingLine.split("'");
@@ -233,12 +234,75 @@ public class RaceResults {
         for (String token : tokens) {
             if (token.contains(YesterdayDateString)) {
                 URLstring = "https://www.racenet.com.au" + token;
-                System.out.println(URLstring);
+                Venue=getInfo(MeetingLine,YesterdayDateString+"'>",12);
+                System.out.println("URLstring="+URLstring);
+                System.out.println("Venue="+Venue);
             }
         }
 
-        //       formpage = getPage(URLstring);
-//        extractVENUE(formpage);
+        resultpage = getPage(URLstring);
+        extractRACE(resultpage);
     }
+
+    // *********************************************************************************************************************
+    // split the form page string into venue and get fields
+    public static void extractRACE(String resultpagestring) {
+        String Venue;
+        String VenueWithDate = null;
+        String delims = "\\r\\n";
+
+        // Split string based on delims.
+        String[] tokens = resultpagestring.split(delims);
+
+        for (String token : tokens) {
+            if (token.contains("resultsListContainer")) {
+//                Venue = getInfo(token, "fieldsMeeting", "</span>", 15);
+//                VenueWithDate = Venue + getInfo(token, "fieldsDate", "</span>", 12);
+                WriteFile(OutputFileName, APPEND, token);
+
+            }
+
+//            if (token.contains("fieldsTblRaceNo")) {
+//                parsefields(token, "/tr", "SmallForm right", VenueWithDate);
+//            }
+        }
+
+    }
+
+// *********************************************************************************************************************
+    // split up the string
+    public static String getInfo(String InputString, String StartString, String EndString, Integer StartSkipCount) {
+        String RequiredString = null;
+        Integer StartInt = 0;
+        Integer EndInt = 0;
+        Integer LenInt = 0;
+
+        StartInt = InputString.indexOf(StartString, 0) + StartSkipCount;
+        EndInt = InputString.indexOf(EndString, StartInt);
+        LenInt = EndInt - StartInt;
+
+        if (LenInt > 0) {
+            RequiredString = InputString.substring(StartInt, EndInt);
+        }
+
+        return RequiredString;
+    }
+    public static String getInfo(String InputString, String StartString, Integer StartSkipCount) {
+        String RequiredString = null;
+        Integer StartInt = 0;
+        Integer EndInt = 0;
+        Integer LenInt = 0;
+
+        StartInt = InputString.indexOf(StartString, 0) + StartSkipCount;
+//        EndInt = InputString.indexOf(EndString, StartInt);
+//        LenInt = InputString.length() - StartInt;
+
+        if (StartInt > 0) {
+            RequiredString = InputString.substring(StartInt);
+        }
+
+        return RequiredString;
+    }
+
 
 }
